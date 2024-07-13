@@ -48,6 +48,10 @@ public class Line {
         return color;
     }
 
+    public Sections getSections() {
+        return sections;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
