@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nextstep.subway.utils.TestUtil.노선_생성_Extract;
-import static nextstep.subway.utils.TestUtil.노선_조회_Extract;
+import static nextstep.subway.acceptance.AcceptanceTestUtil.노선_생성_Extract;
+import static nextstep.subway.acceptance.AcceptanceTestUtil.노선_조회_Extract;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
