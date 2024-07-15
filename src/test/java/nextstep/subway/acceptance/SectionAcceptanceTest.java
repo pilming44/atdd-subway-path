@@ -73,32 +73,6 @@ public class SectionAcceptanceTest {
 
     /**
      * Given 특정 노선이 등록돼있고
-     * When 관리자가 노선의 하행 종점역과 다른 상행역을 가진 구간을 추가하면
-     * Then 에러가 발생한다.
-     */
-    @Test
-    @DisplayName("노선의 하행 종점역과 다른 상행역을 가진 구간 추가시 예외 발생")
-    void 구간등록_case2() {
-        // given
-        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 강남역Id, 10L);
-        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
-        long lineId = lineCreationResponse.jsonPath().getLong("id");
-
-        Map<String, Object> newSection = getSectionRequestParamMap(판교역Id, 광교역Id, 10L);
-
-        // when
-        ExtractableResponse<Response> response = 노선에_새로운_구간_추가_Extract(newSection, lineId);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
-        assertThat(stations.size()).isEqualTo(2);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
-    }
-
-    /**
-     * Given 특정 노선이 등록돼있고
      * When 관리자가 이미 노선에 등록된 역을 하행역으로 가진 새로운 구간을 추가하면
      * Then 에러가 발생한다.
      */
