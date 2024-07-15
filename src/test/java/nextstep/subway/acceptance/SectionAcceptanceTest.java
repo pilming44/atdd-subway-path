@@ -28,6 +28,7 @@ public class SectionAcceptanceTest {
     private JdbcTemplate jdbcTemplate;
 
     private Long 신사역Id;
+    private Long 논현역Id;
     private Long 강남역Id;
     private Long 판교역Id;
     private Long 광교역Id;
@@ -39,6 +40,7 @@ public class SectionAcceptanceTest {
         sectionTestSetup.setUpDatabase();
 
         신사역Id = 역_생성("신사역").jsonPath().getLong("id");
+        논현역Id = 역_생성("논현역").jsonPath().getLong("id");
         강남역Id = 역_생성("강남역").jsonPath().getLong("id");
         판교역Id = 역_생성("판교역").jsonPath().getLong("id");
         광교역Id = 역_생성("광교역").jsonPath().getLong("id");
@@ -93,8 +95,8 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(2);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
     }
 
     /**
@@ -121,8 +123,8 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(2);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
     }
 
     /**
@@ -149,9 +151,9 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(3);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
-        assertThat(stations.get(2).get("id")).isEqualTo(3);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
+        assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(판교역Id);
     }
 
     /**
@@ -178,9 +180,9 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(3);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
-        assertThat(stations.get(2).get("id")).isEqualTo(3);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
+        assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(판교역Id);
     }
 
     /**
@@ -203,9 +205,38 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
         assertThat(stations.size()).isEqualTo(2);
-        assertThat(stations.get(0).get("id")).isEqualTo(1);
-        assertThat(stations.get(1).get("id")).isEqualTo(2);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
     }
+    /**
+     * Given 구간이 1개(A-B) 등록된 노선이 있고,
+     * When 구간 사이에 노선(A-C)을 추가하면
+     * Then 구간 사이에 새로운 구간이 추가된다(A-C, C-B)
+     */
+    @Test
+    @DisplayName("노선에 역 추가 시 노선 가운데 추가 할 수 있다.")
+    void 노선_중간에_구간_추가() {
+        // given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 강남역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
+
+        Map<String, Object> newSection = getSectionRequestParamMap(신사역Id, 논현역Id, 4L);
+
+        // when
+        ExtractableResponse<Response> response = 노선에_새로운_구간_추가_Extract(newSection, lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(3);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(논현역Id);
+        assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(강남역Id);
+
+
+    }
+
     private Map<String, Object> getLineRequestParamMap(
             String name,
             String color,
