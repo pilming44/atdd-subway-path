@@ -46,15 +46,58 @@ public class Sections {
     }
 
     public void addSection(Section section) {
+        if (sectionList.isEmpty()) {
+            sectionList.add(section);
+            return;
+        }
 
-        validateStationLink(section);
+        Line newSectionLine = section.getLine();
+        Station newSectionUpStation = section.getUpStation();
+        Station newSectionDownStation = section.getDownStation();
+        Long newSectionDistance = section.getDistance();
 
-        validateStationDuplication(section);
+        //새로운 구간의 하행역이 기존구간의 상행종점역과 일치할떄 = 맨앞에 추가
+        Station oldSectionUpEndStation = sectionList.get(0).getUpStation();
+        Station oldSectionDownEndStation = sectionList.get(sectionList.size()-1).getDownStation();
 
-        sectionList.add(section);
+        if (oldSectionUpEndStation.getId() == newSectionDownStation.getId()) {
+            validateStationDuplication(newSectionUpStation);
+            sectionList.add(0,section);
+        }else if (oldSectionDownEndStation.getId() == newSectionUpStation.getId()) {
+            //새로운 구간의 상행역과 일치하는 기존구간이 맨 마지막 구간일때 = 맨 끝에 추가
+            validateStationDuplication(newSectionDownStation);
+            sectionList.add(section);
+        } else if (isMiddleSection(newSectionUpStation)) {
+            //새로운 구간의 상행역이 기존구간의 하행역과 일치할때 = 중간에 추가
+            for (int index = 0; index < sectionList.size(); index++) {
+                Station oldSectionUpStation = sectionList.get(index).getUpStation();
+
+                if (oldSectionUpStation.getId() == newSectionUpStation.getId()) {
+                    validateStationDuplication(newSectionDownStation);
+                    Station oldSectionDownStation = sectionList.get(index).getDownStation();
+                    Long oldDistance = sectionList.get(index).getDistance();
+                    if (oldDistance <= newSectionDistance || newSectionDistance <= 0) {
+                        throw new IllegalSectionException("신규 구간 거리가 올바르지않습니다.");
+                    }
+
+                    sectionList.remove(index);
+                    Section rightSection = new Section(newSectionLine, newSectionDownStation, oldSectionDownStation, oldDistance - newSectionDistance);
+                    sectionList.add(index, rightSection);
+                    Section leftSection = new Section(newSectionLine, oldSectionUpStation, newSectionDownStation, newSectionDistance);
+                    sectionList.add(index, leftSection);
+                }
+            }
+        } else {
+            throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
+        }
     }
 
-    public Section removedSection(Station downStation) {
+    private boolean isMiddleSection(Station newSectionUpStation) {
+        return sectionList.stream()
+                .anyMatch(sec -> sec.getUpStation().getId() == newSectionUpStation.getId());
+    }
+
+    public void removeSection(Station downStation) {
 
         validateDeleteEmpty();
 
@@ -62,11 +105,7 @@ public class Sections {
 
         validateDeletableSection(downStation);
 
-        Section removedSection = sectionList.get(sectionList.size() - 1);
-
         sectionList.remove(sectionList.size() - 1);
-
-        return removedSection;
     }
 
     private Optional<Section> findNextSection(Section tempSection) {
@@ -75,21 +114,12 @@ public class Sections {
                 .findFirst();
     }
 
-    private void validateStationDuplication(Section section) {
+    private void validateStationDuplication(Station station) {
         for (Section s : sectionList) {
-            if (s.getUpStation().getId() == section.getDownStation().getId()
-                    || s.getDownStation().getId() == section.getDownStation().getId()) {
-                throw new IllegalSectionException("구간의 하행역이 이미 노선에 등록되어있는 역입니다.");
+            if (s.getUpStation().getId() == station.getId()
+                    || s.getDownStation().getId() == station.getId()) {
+                throw new IllegalSectionException("이미 노선에 등록되어있는 역입니다.");
             }
-        }
-    }
-
-    private void validateStationLink(Section section) {
-        if (sectionList.isEmpty()) {
-            return;
-        }
-        if (sectionList.get(sectionList.size() - 1).getDownStation().getId() != section.getUpStation().getId()) {
-            throw new IllegalSectionException("구간의 상행역이 노선 마지막 하행종점역이 아닙니다.");
         }
     }
 

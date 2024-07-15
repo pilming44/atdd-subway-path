@@ -34,12 +34,12 @@ public class Line {
         return sections.getStations();
     }
 
-    public void addSection(Section section) {
-        sections.addSection(section);
+    public void addSection(Station upStation, Station downStation, Long distance) {
+        this.sections.addSection(new Section(this, upStation, downStation, distance));
     }
 
-    public Section removedSection(Station downStation) {
-        return sections.removedSection(downStation);
+    public void removeSection(Station downStation) {
+        sections.removeSection(downStation);
     }
 
     public Long getId() {

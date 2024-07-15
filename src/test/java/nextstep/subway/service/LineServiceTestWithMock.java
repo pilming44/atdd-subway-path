@@ -34,9 +34,6 @@ class LineServiceTestWithMock {
     @Mock
     private StationRepository stationRepository;
 
-    @Mock
-    private SectionRepository sectionRepository;
-
     @InjectMocks
     private LineService lineService;
 

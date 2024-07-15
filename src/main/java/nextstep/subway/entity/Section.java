@@ -30,7 +30,6 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
-        line.addSection(this);
     }
 
     private static void validateStations(Station upStation, Station downStation) {

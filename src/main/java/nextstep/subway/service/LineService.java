@@ -11,7 +11,6 @@ import nextstep.subway.entity.Station;
 import nextstep.subway.exception.NoSuchLineException;
 import nextstep.subway.exception.NoSuchStationException;
 import nextstep.subway.repository.LineRepository;
-import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.StationRepository;
 
 import java.util.List;
@@ -23,12 +22,10 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
-    private final SectionRepository sectionRepository;
 
-    public LineService(LineRepository lineRepository, StationRepository stationRepository, SectionRepository sectionRepository) {
+    public LineService(LineRepository lineRepository, StationRepository stationRepository) {
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @Transactional
@@ -43,8 +40,7 @@ public class LineService {
             downStation = getStation(lineRequest.getDownStationId());
         }
         Line line = lineRepository.save(new Line(lineRequest.getName(), lineRequest.getColor()));
-
-        sectionRepository.save(new Section(line, upStation, downStation, lineRequest.getDistance()));
+        line.addSection(upStation, downStation, lineRequest.getDistance());
 
         return LineResponse.from(line);
     }
@@ -79,9 +75,7 @@ public class LineService {
 
         Station downStation = getStation(sectionRequest.getDownStationId());
 
-        Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
-
-        sectionRepository.save(section);
+        line.addSection(upStation, downStation, sectionRequest.getDistance());
 
         return LineResponse.from(line);
     }
@@ -91,9 +85,7 @@ public class LineService {
         Line line = getLine(id);
         Station downStation = getStation(stationId);
 
-        Section removedSection = line.removedSection(downStation);
-
-        sectionRepository.delete(removedSection);
+        line.removeSection(downStation);
     }
 
     private Line getLine(Long id) {
