@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Embeddable
 public class Sections {
-    @OneToMany(mappedBy = "line", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>();
 
     public List<Section> getSectionList() {
@@ -51,44 +51,74 @@ public class Sections {
             return;
         }
 
-        Line newSectionLine = section.getLine();
-        Station newSectionUpStation = section.getUpStation();
-        Station newSectionDownStation = section.getDownStation();
-        Long newSectionDistance = section.getDistance();
+        Station newUpStation = section.getUpStation();
+        Station newDownStation = section.getDownStation();
 
-        //새로운 구간의 하행역이 기존구간의 상행종점역과 일치할떄 = 맨앞에 추가
-        Station oldSectionUpEndStation = sectionList.get(0).getUpStation();
-        Station oldSectionDownEndStation = sectionList.get(sectionList.size()-1).getDownStation();
+        Station firstUpStation = sectionList.get(0).getUpStation();
+        Station lastDownStation = sectionList.get(sectionList.size() - 1).getDownStation();
 
-        if (oldSectionUpEndStation.getId() == newSectionDownStation.getId()) {
-            validateStationDuplication(newSectionUpStation);
-            sectionList.add(0,section);
-        }else if (oldSectionDownEndStation.getId() == newSectionUpStation.getId()) {
-            //새로운 구간의 상행역과 일치하는 기존구간이 맨 마지막 구간일때 = 맨 끝에 추가
-            validateStationDuplication(newSectionDownStation);
-            sectionList.add(section);
-        } else if (isMiddleSection(newSectionUpStation)) {
-            //새로운 구간의 상행역이 기존구간의 하행역과 일치할때 = 중간에 추가
-            for (int index = 0; index < sectionList.size(); index++) {
-                Station oldSectionUpStation = sectionList.get(index).getUpStation();
-
-                if (oldSectionUpStation.getId() == newSectionUpStation.getId()) {
-                    validateStationDuplication(newSectionDownStation);
-                    Station oldSectionDownStation = sectionList.get(index).getDownStation();
-                    Long oldDistance = sectionList.get(index).getDistance();
-                    if (oldDistance <= newSectionDistance || newSectionDistance <= 0) {
-                        throw new IllegalSectionException("신규 구간 거리가 올바르지않습니다.");
-                    }
-
-                    sectionList.remove(index);
-                    Section rightSection = new Section(newSectionLine, newSectionDownStation, oldSectionDownStation, oldDistance - newSectionDistance);
-                    sectionList.add(index, rightSection);
-                    Section leftSection = new Section(newSectionLine, oldSectionUpStation, newSectionDownStation, newSectionDistance);
-                    sectionList.add(index, leftSection);
-                }
-            }
+        if (isFirstSection(newDownStation, firstUpStation)) {
+            addSectionToFront(section);
+        } else if (isLastSection(newUpStation, lastDownStation)) {
+            addSectionToEnd(section);
+        } else if (isMiddleSection(newUpStation)) {
+            addSectionToMiddle(section);
         } else {
             throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
+        }
+    }
+
+    private boolean isFirstSection(Station newDownStation, Station firstUpStation) {
+        return firstUpStation.getId() == newDownStation.getId();
+    }
+
+    private boolean isLastSection(Station newUpStation, Station lastDownStation) {
+        return lastDownStation.getId() == newUpStation.getId();
+    }
+
+    private void addSectionToFront(Section section) {
+        validateStationDuplication(section.getUpStation());
+        List<Section> sections = new ArrayList<>(sectionList);
+        sectionList.clear();
+        sectionList.add(section);
+        for (Section s : sections) {
+            sectionList.add(new Section(s.getLine(), s.getUpStation(), s.getDownStation(), s.getDistance()));
+        }
+    }
+
+    private void addSectionToEnd(Section section) {
+        validateStationDuplication(section.getDownStation());
+        sectionList.add(section);
+    }
+
+    private void addSectionToMiddle(Section section) {
+        Station newUpStation = section.getUpStation();
+        Station newDownStation = section.getDownStation();
+        Long newDistance = section.getDistance();
+
+        int oldIndex = 0;
+        Section oldSection = new Section();
+        for (int index = 0; index < sectionList.size(); index++) {
+            Section currentSection = sectionList.get(index);
+            if (currentSection.getUpStation().getId() == newUpStation.getId()) {
+                validateStationDuplication(newDownStation);
+                validateDistance(currentSection, newDistance);
+                oldIndex = index;
+                oldSection = currentSection;
+                break;
+            }
+        }
+        Section rightSection = new Section(section.getLine(), newDownStation, oldSection.getDownStation(),
+                oldSection.getDistance() - newDistance);
+        sectionList.set(oldIndex, rightSection);
+
+        Section leftSection = new Section(section.getLine(), newUpStation, newDownStation, newDistance);
+        sectionList.add(oldIndex, leftSection);
+    }
+
+    private void validateDistance(Section currentSection, Long newDistance) {
+        if (currentSection.getDistance() <= newDistance || newDistance <= 0) {
+            throw new IllegalSectionException("신규 구간 거리가 올바르지 않습니다.");
         }
     }
 

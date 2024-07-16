@@ -233,8 +233,54 @@ public class SectionAcceptanceTest {
         assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
         assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(논현역Id);
         assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(강남역Id);
+    }
 
+    /**
+     * Given 구간이 1개 등록된 노선이 있고,
+     * When 노선 처음엔 새로운 구간을 추가하면
+     * Then 노선의 맨 앞에 구간이 추가되고 구간은 총 2개가 된다.
+     */
+    @Test
+    @DisplayName("노선에 역 추가 시 노선 처음에 추가 할 수 있다.")
+    void 노선_맨_앞에_구간_추가() {
+        // given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 논현역Id, 강남역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
 
+        Map<String, Object> newSection = getSectionRequestParamMap(신사역Id, 논현역Id, 4L);
+
+        // when
+        ExtractableResponse<Response> response = 노선에_새로운_구간_추가_Extract(newSection, lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(3);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(논현역Id);
+        assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(강남역Id);
+    }
+
+    /**
+     * Given 구간이 2개(A-B, B-C) 등록된 노선이 있고,
+     * When 이미 등록된 역(A)이 포함된 구간(C-A)을 등록하면
+     * Then 에러가 발생한다.
+     */
+    @Test
+    @DisplayName("이미 등록되어있는 역은 노선에 등록될 수 없다.")
+    void 중복된_역_등록_불가능() {
+        // given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
+        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(논현역Id, 강남역Id, 4L), lineId);
+
+        // when
+        ExtractableResponse<Response> response = 노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(강남역Id, 신사역Id, 4L), lineId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     private Map<String, Object> getLineRequestParamMap(

@@ -6,7 +6,6 @@ import nextstep.subway.dto.LineRequest;
 import nextstep.subway.dto.LineResponse;
 import nextstep.subway.dto.SectionRequest;
 import nextstep.subway.entity.Line;
-import nextstep.subway.entity.Section;
 import nextstep.subway.entity.Station;
 import nextstep.subway.exception.NoSuchLineException;
 import nextstep.subway.exception.NoSuchStationException;
@@ -53,7 +52,8 @@ public class LineService {
     }
 
     public LineResponse findLine(Long id) {
-        return LineResponse.from(getLine(id));
+        Line line = getLine(id);
+        return LineResponse.from(line);
     }
 
     @Transactional
