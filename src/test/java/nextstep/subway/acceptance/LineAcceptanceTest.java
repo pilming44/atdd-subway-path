@@ -43,6 +43,7 @@ public class LineAcceptanceTest {
         논현역Id = 역_생성("논현역").jsonPath().getLong("id");
         강남역Id = 역_생성("강남역").jsonPath().getLong("id");
         신분당선_요청_매개변수 = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+
     }
 
     @Test
@@ -65,6 +66,29 @@ public class LineAcceptanceTest {
         assertThat(firstStation.get("name")).isEqualTo("신사역");
         assertThat(Long.valueOf(String.valueOf(secondStation.get("id")))).isEqualTo(논현역Id);
         assertThat(secondStation.get("name")).isEqualTo("논현역");
+    }
+    @Test
+    @DisplayName("존재하지 않는 상행역을 포함한 노선을 생성하면 에러가 발생한다.")
+    void 존재하지_않는_상행역을_포함한_노선_생성() {
+        //given
+        Map<String, Object> 분당선_요청_매개변수 = getLineRequestParamMap("분당선", "bg-green-600", 99L, 신사역Id, 7L);
+        // when
+        ExtractableResponse<Response> response = 노선_생성_Extract(분당선_요청_매개변수);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 하행역을 포함한 노선을 생성하면 에러가 발생한다.")
+    void 존재하지_않는_하행역을_포함한_노선_생성() {
+        //given
+        Map<String, Object> 분당선_요청_매개변수 = getLineRequestParamMap("분당선", "bg-green-600", 신사역Id, 99L, 7L);
+        // when
+        ExtractableResponse<Response> response = 노선_생성_Extract(분당선_요청_매개변수);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(404);
     }
 
     @Test
@@ -121,6 +145,16 @@ public class LineAcceptanceTest {
         assertThat(Long.valueOf(String.valueOf(stations.get(1).get("id")))).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("존재하지 않는 노선을 조회하면 에러가 발생한다.")
+    void 존재하지_않는_노선을_조회() {
+        // when
+        ExtractableResponse<Response> response = 노선_조회_Extract(9999L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(404);
+    }
+
 
     @Test
     @DisplayName("지하철 노선을 수정한다.")
@@ -128,11 +162,11 @@ public class LineAcceptanceTest {
         // given
         long lineId = 노선_생성_Extract(신분당선_요청_매개변수).jsonPath().getLong("id");
 
-        // when
         Map<String, Object> 노선_수정_매개변수 = new HashMap<>();
         노선_수정_매개변수.put("name", "다른분당선");
         노선_수정_매개변수.put("color", "bg-red-700");
 
+        // when
         ExtractableResponse<Response> patchResponse = patchLineExtract(노선_수정_매개변수, lineId);
 
         ExtractableResponse<Response> viewResponse = 노선_조회_Extract(lineId);
@@ -142,6 +176,21 @@ public class LineAcceptanceTest {
 
         assertThat(viewResponse.jsonPath().getString("name")).isEqualTo("다른분당선");
         assertThat(viewResponse.jsonPath().getString("color")).isEqualTo("bg-red-700");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 노선을 수정하면 에러가 발생한다.")
+    void 존재하지_않는_노선_수정() {
+        //given
+        Map<String, Object> 노선_수정_매개변수 = new HashMap<>();
+        노선_수정_매개변수.put("name", "다른분당선");
+        노선_수정_매개변수.put("color", "bg-red-700");
+
+        // when
+        ExtractableResponse<Response> patchResponse = patchLineExtract(노선_수정_매개변수, 999L);
+
+        // then
+        assertThat(patchResponse.statusCode()).isEqualTo(404);
     }
 
     @Test
@@ -155,6 +204,16 @@ public class LineAcceptanceTest {
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(204);
         assertThat(노선_조회_Extract(lineId).statusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 노선을 삭제하면 에러가 발생한다.")
+    void 존재하지_않는_노선_삭제() {
+        // when
+        ExtractableResponse<Response> deleteResponse = deleteLineExtract(999L);
+
+        // then
+        assertThat(deleteResponse.statusCode()).isEqualTo(404);
     }
 
     private Map<String, Object> getLineRequestParamMap(
