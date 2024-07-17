@@ -45,12 +45,18 @@ public class Sections {
         return stations;
     }
 
+    public boolean addableSection(Section newSection) {
+        validateStationDuplication(newSection);
+        validateLinkableSection(newSection);
+        validateMidAddableDistance(newSection);
+        return true;
+    }
+
     public void addSection(Section section) {
         if (sectionList.isEmpty()) {
             sectionList.add(section);
             return;
         }
-
         Station newUpStation = section.getUpStation();
         Station newDownStation = section.getDownStation();
 
@@ -75,6 +81,13 @@ public class Sections {
         throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
     }
 
+    public void removeSection(Station downStation) {
+        validateDeleteEmpty();
+        validateDeleteOnlyOne();
+        validateDeletableSection(downStation);
+        sectionList.remove(sectionList.size() - 1);
+    }
+
     private boolean isFirstSection(Station newDownStation, Station firstUpStation) {
         return firstUpStation.getId() == newDownStation.getId();
     }
@@ -84,7 +97,6 @@ public class Sections {
     }
 
     private void addSectionToFront(Section section) {
-        validateStationDuplication(section.getUpStation());
         List<Section> sections = new ArrayList<>(sectionList);
         sectionList.clear();
         sectionList.add(section);
@@ -94,7 +106,6 @@ public class Sections {
     }
 
     private void addSectionToEnd(Section section) {
-        validateStationDuplication(section.getDownStation());
         sectionList.add(section);
     }
 
@@ -103,18 +114,14 @@ public class Sections {
         Station newDownStation = section.getDownStation();
         Long newDistance = section.getDistance();
 
-        int oldIndex = 0;
-        Section oldSection = new Section();
-        for (int index = 0; index < sectionList.size(); index++) {
-            Section currentSection = sectionList.get(index);
-            if (currentSection.getUpStation().getId() == newUpStation.getId()) {
-                validateStationDuplication(newDownStation);
-                validateDistance(currentSection, newDistance);
-                oldIndex = index;
-                oldSection = currentSection;
-                break;
-            }
+        Optional<Section> sectionByUpStation = findSectionByUpStation(section.getUpStation());
+        if (!sectionByUpStation.isPresent()) {
+            throw new IllegalSectionException("구간을 추가할 수 없습니다.");
         }
+        Section oldSection = sectionByUpStation.get();
+
+        int oldIndex = sectionList.indexOf(oldSection);
+
         Section rightSection = new Section(section.getLine(), newDownStation, oldSection.getDownStation(),
                 oldSection.getDistance() - newDistance);
         sectionList.set(oldIndex, rightSection);
@@ -123,26 +130,9 @@ public class Sections {
         sectionList.add(oldIndex, leftSection);
     }
 
-    private void validateDistance(Section currentSection, Long newDistance) {
-        if (currentSection.getDistance() <= newDistance || newDistance <= 0) {
-            throw new IllegalSectionException("신규 구간 거리가 올바르지 않습니다.");
-        }
-    }
-
     private boolean isMiddleSection(Station newSectionUpStation) {
         return sectionList.stream()
                 .anyMatch(sec -> sec.getUpStation().getId() == newSectionUpStation.getId());
-    }
-
-    public void removeSection(Station downStation) {
-
-        validateDeleteEmpty();
-
-        validateDeleteOnlyOne();
-
-        validateDeletableSection(downStation);
-
-        sectionList.remove(sectionList.size() - 1);
     }
 
     private Optional<Section> findNextSection(Section tempSection) {
@@ -151,11 +141,10 @@ public class Sections {
                 .findFirst();
     }
 
-    private void validateStationDuplication(Station station) {
-        boolean isContain = sectionList.stream().anyMatch(section -> section.containsStation(station));
-        if (isContain) {
-            throw new IllegalSectionException("이미 노선에 등록되어있는 역입니다.");
-        }
+    private Optional<Section> findSectionByUpStation(Station station) {
+        return sectionList.stream()
+                .filter(s -> s.getUpStation().equals(station))
+                .findFirst();
     }
 
     private void validateDeletableSection(Station downStation) {
@@ -177,6 +166,39 @@ public class Sections {
     private void validateDeleteEmpty() {
         if (sectionList.isEmpty()) {
             throw new IllegalSectionException("노선에 삭제 할 구간이 없습니다.");
+        }
+    }
+
+    private void validateStationDuplication(Section section) {
+        List<Station> stations = getStations();
+        if (stations.contains(section.getUpStation()) && stations.contains(section.getDownStation())) {
+            throw new IllegalSectionException("이미 등록되어 있는 역은 노선에 추가할 수 없습니다.");
+        }
+    }
+
+    private void validateLinkableSection(Section section) {
+        List<Station> stations = getStations();
+        if(stations.size() != 0 && isUnlinkedSection(section)) {
+            throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
+        }
+    }
+
+    private boolean isUnlinkedSection(Section section) {
+        List<Station> stations = getStations();
+        return !stations.contains(section.getUpStation()) && !stations.contains(section.getDownStation());
+    }
+
+    private void validateMidAddableDistance(Section section) {
+        Optional<Section> OptionalOldSection = findSectionByUpStation(section.getUpStation());
+        if (!OptionalOldSection.isPresent()) {
+            return;
+        }
+        Section oldSection = OptionalOldSection.get();
+        Long oldSectionDistance = oldSection.getDistance();
+        Long newSectionDistance = section.getDistance();
+
+        if (newSectionDistance <= 0 || oldSectionDistance <= newSectionDistance) {
+            throw new IllegalSectionException("신규 구간 거리가 올바르지 않습니다.");
         }
     }
 }

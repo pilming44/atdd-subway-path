@@ -117,8 +117,8 @@ class LineTest {
         신분당선.addSection(신사역, 강남역, 10L);
 
         // when, then
-        assertThatThrownBy(() -> 신분당선.addSection(강남역, 신사역, 10L))
+        assertThatThrownBy(() -> 신분당선.addableSection(강남역, 신사역, 10L))
                 .isInstanceOf(IllegalSectionException.class)
-                .hasMessage("이미 노선에 등록되어있는 역입니다.");
+                .hasMessage("이미 등록되어 있는 역은 노선에 추가할 수 없습니다.");
     }
 }

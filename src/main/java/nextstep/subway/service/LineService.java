@@ -1,5 +1,7 @@
 package nextstep.subway.service;
 
+import nextstep.subway.entity.Section;
+import nextstep.subway.exception.IllegalSectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import nextstep.subway.dto.LineRequest;
@@ -74,6 +76,10 @@ public class LineService {
         Station upStation = getStation(sectionRequest.getUpStationId());
 
         Station downStation = getStation(sectionRequest.getDownStationId());
+
+        if(!line.addableSection(upStation, downStation, sectionRequest.getDistance())) {
+            throw new IllegalSectionException("추가할 수 없는 구간입니다.");
+        }
 
         line.addSection(upStation, downStation, sectionRequest.getDistance());
 

@@ -34,6 +34,10 @@ public class Line {
         return sections.getStations();
     }
 
+    public boolean addableSection(Station upStation, Station downStation, Long distance) {
+        return sections.addableSection(new Section(this, upStation, downStation, distance));
+    }
+
     public void addSection(Station upStation, Station downStation, Long distance) {
         this.sections.addSection(new Section(this, upStation, downStation, distance));
     }
