@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nextstep.subway.acceptance.AcceptanceTestUtil.*;
-import static nextstep.subway.acceptance.AcceptanceTestUtil.역_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")

@@ -1,6 +1,5 @@
 package nextstep.subway.service;
 
-import nextstep.subway.entity.Section;
 import nextstep.subway.exception.IllegalSectionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

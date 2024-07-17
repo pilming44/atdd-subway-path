@@ -7,7 +7,6 @@ import nextstep.subway.entity.Section;
 import nextstep.subway.entity.Sections;
 import nextstep.subway.entity.Station;
 import nextstep.subway.repository.LineRepository;
-import nextstep.subway.repository.SectionRepository;
 import nextstep.subway.repository.StationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
