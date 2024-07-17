@@ -152,11 +152,9 @@ public class Sections {
     }
 
     private void validateStationDuplication(Station station) {
-        for (Section s : sectionList) {
-            if (s.getUpStation().getId() == station.getId()
-                    || s.getDownStation().getId() == station.getId()) {
-                throw new IllegalSectionException("이미 노선에 등록되어있는 역입니다.");
-            }
+        boolean isContain = sectionList.stream().anyMatch(section -> section.containsStation(station));
+        if (isContain) {
+            throw new IllegalSectionException("이미 노선에 등록되어있는 역입니다.");
         }
     }
 
