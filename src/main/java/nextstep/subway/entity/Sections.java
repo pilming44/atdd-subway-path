@@ -176,7 +176,7 @@ public class Sections {
 
     private void validateLinkableSection(Section section) {
         List<Station> stations = getStations();
-        if(stations.size() != 0 && isUnlinkedSection(section)) {
+        if (stations.size() != 0 && isUnlinkedSection(section)) {
             throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
         }
     }

@@ -37,9 +37,9 @@ public class StationAcceptanceTest {
 
         // then
         List<String> stationNames = requestSpecificationWithLog()
-                        .when().get("/stations")
-                        .then().log().all()
-                        .extract().jsonPath().getList("name", String.class);
+                .when().get("/stations")
+                .then().log().all()
+                .extract().jsonPath().getList("name", String.class);
         assertThat(stationNames).containsAnyOf("강남역");
     }
 

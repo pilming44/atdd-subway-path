@@ -46,5 +46,6 @@ public final class AcceptanceTestUtil {
                 .extract();
     }
 
-    private AcceptanceTestUtil() {}
+    private AcceptanceTestUtil() {
+    }
 }

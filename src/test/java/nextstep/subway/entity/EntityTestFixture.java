@@ -6,5 +6,6 @@ public final class EntityTestFixture {
     static Station 판교역 = new Station(3L, "판교역");
     static Station 광교역 = new Station(4L, "광교역");
 
-    private EntityTestFixture() {}
+    private EntityTestFixture() {
+    }
 }

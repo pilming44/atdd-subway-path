@@ -38,7 +38,7 @@ class LineServiceTestWithMock {
 
     @BeforeEach
     void setUp() {
-        신분당선 = new Line(1L,"신분당선", "#77777");
+        신분당선 = new Line(1L, "신분당선", "#77777");
         when(lineRepository.findById(신분당선.getId())).thenReturn(Optional.of(신분당선));
         when(stationRepository.findById(신사역.getId())).thenReturn(Optional.of(신사역));
         when(stationRepository.findById(강남역.getId())).thenReturn(Optional.of(강남역));

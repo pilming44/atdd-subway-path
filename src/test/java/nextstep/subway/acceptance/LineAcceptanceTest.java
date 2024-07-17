@@ -66,6 +66,7 @@ public class LineAcceptanceTest {
         assertThat(Long.valueOf(String.valueOf(secondStation.get("id")))).isEqualTo(논현역Id);
         assertThat(secondStation.get("name")).isEqualTo("논현역");
     }
+
     @Test
     @DisplayName("존재하지 않는 상행역을 포함한 노선을 생성하면 에러가 발생한다.")
     void 존재하지_않는_상행역을_포함한_노선_생성() {
@@ -229,6 +230,7 @@ public class LineAcceptanceTest {
         params.put("distance", distance);
         return params;
     }
+
     private ExtractableResponse<Response> getLineListExtract() {
         return RestAssured.given().log().all()
                 .when().get("/lines")

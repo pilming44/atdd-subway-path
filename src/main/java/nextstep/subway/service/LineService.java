@@ -77,7 +77,7 @@ public class LineService {
 
         Station downStation = getStation(sectionRequest.getDownStationId());
 
-        if(!line.addableSection(upStation, downStation, sectionRequest.getDistance())) {
+        if (!line.addableSection(upStation, downStation, sectionRequest.getDistance())) {
             throw new IllegalSectionException("추가할 수 없는 구간입니다.");
         }
 

@@ -5,7 +5,8 @@ public class SectionRequest {
     private Long downStationId;
     private Long distance;
 
-    public SectionRequest() {}
+    public SectionRequest() {
+    }
 
     public SectionRequest(Long upStationId, Long downStationId, Long distance) {
         this.upStationId = upStationId;

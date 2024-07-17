@@ -41,7 +41,7 @@ public class LineResponse {
         List<StationResponse> stationResponse = stations.stream()
                 .map(station -> new StationResponse(station.getId(), station.getName()))
                 .collect(Collectors.toList());
-        LineResponse lineResponse =  new LineResponse(
+        LineResponse lineResponse = new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),

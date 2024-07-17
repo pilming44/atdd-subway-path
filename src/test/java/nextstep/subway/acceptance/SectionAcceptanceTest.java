@@ -208,6 +208,7 @@ public class SectionAcceptanceTest {
         assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
         assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
     }
+
     /**
      * Given 구간이 1개(A-B) 등록된 노선이 있고,
      * When 구간 사이에 노선(A-C)을 추가하면
