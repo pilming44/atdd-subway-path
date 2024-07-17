@@ -77,8 +77,6 @@ public class Sections {
             addSectionToMiddle(section);
             return;
         }
-
-        throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
     }
 
     public void removeSection(Station downStation) {
