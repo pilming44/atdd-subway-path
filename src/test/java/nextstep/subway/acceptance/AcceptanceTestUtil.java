@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AcceptanceTestUtil {
+public final class AcceptanceTestUtil {
     static ExtractableResponse<Response> 노선_생성_Extract(Map<String, Object> params) {
         return RestAssured.given().log().all()
                 .body(params)
@@ -47,4 +47,6 @@ public class AcceptanceTestUtil {
                 .then().log().all()
                 .extract();
     }
+
+    private AcceptanceTestUtil() {}
 }
