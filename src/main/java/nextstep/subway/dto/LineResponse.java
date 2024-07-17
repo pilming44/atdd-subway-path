@@ -5,12 +5,13 @@ import nextstep.subway.entity.Station;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
     private String name;
     private String color;
-    private List<Station> stations = new ArrayList<>();
+    private List<StationResponse> stations = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -24,11 +25,11 @@ public class LineResponse {
         return color;
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 
-    private LineResponse(Long id, String name, String color, List<Station> stations) {
+    private LineResponse(Long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -36,11 +37,15 @@ public class LineResponse {
     }
 
     public static LineResponse from(Line line) {
+        List<Station> stations = line.getStations();
+        List<StationResponse> stationResponse = stations.stream()
+                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .collect(Collectors.toList());
         LineResponse lineResponse =  new LineResponse(
                 line.getId(),
                 line.getName(),
                 line.getColor(),
-                line.getStations()
+                stationResponse
         );
         return lineResponse;
     }
