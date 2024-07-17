@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static nextstep.subway.entity.EntityTestUtil.신사역;
+import static nextstep.subway.entity.EntityTestFixture.신사역;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("구간 단위테스트")

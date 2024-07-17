@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static nextstep.subway.entity.EntityTestUtil.*;
+import static nextstep.subway.entity.EntityTestFixture.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("노선관리 단위테스트")
