@@ -59,13 +59,20 @@ public class Sections {
 
         if (isFirstSection(newDownStation, firstUpStation)) {
             addSectionToFront(section);
-        } else if (isLastSection(newUpStation, lastDownStation)) {
-            addSectionToEnd(section);
-        } else if (isMiddleSection(newUpStation)) {
-            addSectionToMiddle(section);
-        } else {
-            throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
+            return;
         }
+
+        if (isLastSection(newUpStation, lastDownStation)) {
+            addSectionToEnd(section);
+            return;
+        }
+
+        if (isMiddleSection(newUpStation)) {
+            addSectionToMiddle(section);
+            return;
+        }
+
+        throw new IllegalSectionException("노선의 구간과 연결되지 않습니다.");
     }
 
     private boolean isFirstSection(Station newDownStation, Station firstUpStation) {
