@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Transactional
 public class SectionAcceptanceTest {
 
     @Autowired
@@ -34,7 +35,6 @@ public class SectionAcceptanceTest {
     private Long 광교역Id;
 
     @BeforeEach
-    @Transactional
     void setUp() {
         SectionTestSetup sectionTestSetup = new SectionTestSetup(jdbcTemplate);
         sectionTestSetup.setUpDatabase();

@@ -112,16 +112,13 @@ public class Sections {
         Station newDownStation = section.getDownStation();
         Long newDistance = section.getDistance();
 
-        Optional<Section> sectionByUpStation = findSectionByUpStation(section.getUpStation());
-        if (!sectionByUpStation.isPresent()) {
-            throw new IllegalSectionException("구간을 추가할 수 없습니다.");
-        }
-        Section oldSection = sectionByUpStation.get();
+        Section sectionByUpStation = findSectionByUpStation(section.getUpStation())
+                .orElseThrow(()->new IllegalSectionException("구간을 추가할 수 없습니다."));
 
-        int oldIndex = sectionList.indexOf(oldSection);
+        int oldIndex = sectionList.indexOf(sectionByUpStation);
 
-        Section rightSection = new Section(section.getLine(), newDownStation, oldSection.getDownStation(),
-                oldSection.getDistance() - newDistance);
+        Section rightSection = new Section(section.getLine(), newDownStation, sectionByUpStation.getDownStation(),
+                sectionByUpStation.getDistance() - newDistance);
         sectionList.set(oldIndex, rightSection);
 
         Section leftSection = new Section(section.getLine(), newUpStation, newDownStation, newDistance);
