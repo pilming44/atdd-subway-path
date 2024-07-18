@@ -284,6 +284,57 @@ public class SectionAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    /**
+     * Given 구간이 2개(A-B, B-C) 등록된 노선이 있고,
+     * When 가운데 역(B)을 삭제하면
+     * Then 가운데 역은 제거되고 양 옆의 역이 이어진 하나의 구간이 된다.(A-C)
+     */
+    @Test
+    @DisplayName("노선에 등록된 역 제거 시 해당 역이 노선 가운데 있어도 제거할 수 있다.")
+    void 가운데_구간_삭제() {
+        //given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
+        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(논현역Id, 강남역Id, 4L), lineId);
+
+        //when
+        ExtractableResponse<Response> response = getSectionDeletionExtract(lineId, 논현역Id);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(2);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
+    }
+
+
+    /**
+     * Given 구간이 2개(A-B, B-C) 등록된 노선이 있고,
+     * When 상행 종점역(A)을 삭제하면
+     * Then 상행 종점역 구간은 제거된다.(B-C)
+     */
+    @Test
+    @DisplayName("노선에 등록된 역 제거 시 해당 역이 상행 종점역이어도 제거할 수 있다.")
+    void 상행_종점_구간_삭제() {
+        //given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
+        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(논현역Id, 강남역Id, 4L), lineId);
+
+        //when
+        ExtractableResponse<Response> response = getSectionDeletionExtract(lineId, 신사역Id);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
+        assertThat(stations.size()).isEqualTo(2);
+        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(논현역Id);
+        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
+    }
+
     private Map<String, Object> getLineRequestParamMap(
             String name,
             String color,
