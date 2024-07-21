@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Transactional
 public class LineAcceptanceTest {
 
     @Autowired
@@ -33,7 +34,6 @@ public class LineAcceptanceTest {
     Map<String, Object> 신분당선_요청_매개변수;
 
     @BeforeEach
-    @Transactional
     void setUp() {
         LineAndStationSetup lineAndStationSetup = new LineAndStationSetup(jdbcTemplate);
         lineAndStationSetup.setUpDatabase();

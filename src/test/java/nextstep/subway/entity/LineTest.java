@@ -74,19 +74,6 @@ class LineTest {
         assertThat(stations.get(0)).isEqualTo(신사역);
         assertThat(stations.get(1)).isEqualTo(강남역);
     }
-
-    @Test
-    @DisplayName("노선의 마지막 구간이 아닌 구간을 삭제 시 예외발생")
-    void 노선의_마지막_구간이_아닌_구간을_삭제_시_예외발생() {
-        // given
-        신분당선.addSection(신사역, 강남역, 10L);
-        신분당선.addSection(강남역, 판교역, 10L);
-
-        // when, then
-        assertThatThrownBy(() -> 신분당선.removeSection(강남역))
-                .isInstanceOf(IllegalSectionException.class)
-                .hasMessage("노선의 마지막 구간이 아닙니다.");
-    }
     
     @Test
     @DisplayName("노선에 구간이 하나뿐이라면 삭제 시 예외발생")
@@ -120,5 +107,27 @@ class LineTest {
         assertThatThrownBy(() -> 신분당선.addableSection(강남역, 신사역, 10L))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("이미 등록되어 있는 역은 노선에 추가할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("노선 중간 구간 삭제")
+    void 노선_중간_구간_삭제() {
+        // given
+        신분당선.addSection(신사역, 강남역, 10L);
+        신분당선.addSection(강남역, 판교역, 10L);
+
+        // when
+        신분당선.removeSection(강남역);
+
+        // then
+        Sections sections = 신분당선.getSections();
+        List<Station> stations = sections.getStations();
+        assertThat(sections.getSectionListSize()).isEqualTo(1);
+        assertThat(stations.get(0)).isEqualTo(신사역);
+        assertThat(stations.get(1)).isEqualTo(판교역);
+
+        List<Section> sectionList = sections.getSectionList();
+        Long distance = sectionList.get(0).getDistance();
+        assertThat(distance).isEqualTo(20L);
     }
 }

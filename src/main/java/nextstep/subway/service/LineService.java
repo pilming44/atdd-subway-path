@@ -89,9 +89,9 @@ public class LineService {
     @Transactional
     public void removeSection(Long id, Long stationId) {
         Line line = getLine(id);
-        Station downStation = getStation(stationId);
+        Station station = getStation(stationId);
 
-        line.removeSection(downStation);
+        line.removeSection(station);
     }
 
     private Line getLine(Long id) {
