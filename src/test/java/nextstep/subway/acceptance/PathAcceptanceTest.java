@@ -33,12 +33,12 @@ public class PathAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        TestSetup sectionTestSetup = new TestSetup(jdbcTemplate);
-        sectionTestSetup.setUpDatabase();
-        교대역Id = 역_생성("신사역").jsonPath().getLong("id");
-        강남역Id = 역_생성("논현역").jsonPath().getLong("id");
-        양재역Id = 역_생성("강남역").jsonPath().getLong("id");
-        남부터미널역Id = 역_생성("판교역").jsonPath().getLong("id");
+        TestSetup testSetup = new TestSetup(jdbcTemplate);
+        testSetup.setUpDatabase();
+        교대역Id = 역_생성("교대역").jsonPath().getLong("id");
+        강남역Id = 역_생성("강남역").jsonPath().getLong("id");
+        양재역Id = 역_생성("양재역").jsonPath().getLong("id");
+        남부터미널역Id = 역_생성("남부터미널역").jsonPath().getLong("id");
     }
 
     /**
