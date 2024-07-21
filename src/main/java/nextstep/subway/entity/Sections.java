@@ -89,34 +89,41 @@ public class Sections {
     }
 
     private void sectionRemove(Station station) {
-        List<Section> collectSection = sectionList.stream()
-                .filter(s -> s.containsStation(station))
-                .collect(Collectors.toList());
+        List<Section> collectSection = findSectionsContainingStation(station);
 
         if (collectSection.size() == 1) {
-            Section targetSection = collectSection.get(0);
-            int oldIndex = sectionList.indexOf(targetSection);
-            sectionList.remove(oldIndex);
+            removeSingleSection(collectSection.get(0));
             return;
         }
 
         if (collectSection.size() == 2) {
-            Section frontSection = collectSection.get(0);
-            Section backSection = collectSection.get(1);
-
-            Long distanceSum = frontSection.getDistance() + backSection.getDistance();
-
-            Section combinedSection = new Section(frontSection.getLine()
-                    , frontSection.getUpStation()
-                    , backSection.getDownStation()
-                    , distanceSum);
-
-            int frontSectionIndex = sectionList.indexOf(frontSection);
-            int backSectionIndex = sectionList.indexOf(backSection);
-
-            sectionList.set(frontSectionIndex, combinedSection);
-            sectionList.remove(backSectionIndex);
+            removeAndCombineSections(collectSection.get(0), collectSection.get(1));
+            return;
         }
+    }
+
+    private List<Section> findSectionsContainingStation(Station station) {
+        return sectionList.stream()
+                .filter(s -> s.containsStation(station))
+                .collect(Collectors.toList());
+    }
+
+    private void removeSingleSection(Section section) {
+        sectionList.remove(section);
+    }
+
+    private void removeAndCombineSections(Section frontSection, Section backSection) {
+        Long distanceSum = frontSection.getDistance() + backSection.getDistance();
+        Section combinedSection = new Section(frontSection.getLine(),
+                frontSection.getUpStation(),
+                backSection.getDownStation(),
+                distanceSum);
+
+        int frontSectionIndex = sectionList.indexOf(frontSection);
+        int backSectionIndex = sectionList.indexOf(backSection);
+
+        sectionList.set(frontSectionIndex, combinedSection);
+        sectionList.remove(backSectionIndex);
     }
 
     private boolean isFirstSection(Station newDownStation, Station firstUpStation) {
