@@ -160,7 +160,7 @@ public class Sections {
         Long newDistance = section.getDistance();
 
         Section sectionByUpStation = findSectionByUpStation(section.getUpStation())
-                .orElseThrow(()->new IllegalSectionException("구간을 추가할 수 없습니다."));
+                .orElseThrow(() -> new IllegalSectionException("구간을 추가할 수 없습니다."));
 
         int oldIndex = sectionList.indexOf(sectionByUpStation);
 

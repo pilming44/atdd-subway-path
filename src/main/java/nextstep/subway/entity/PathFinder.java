@@ -19,10 +19,10 @@ public class PathFinder {
         Sections sections = line.getSections();
         List<Section> sectionList = sections.getSectionList();
         sectionList.stream()
-                .forEach(s->this.routeMap.setEdgeWeight(
+                .forEach(s -> this.routeMap.setEdgeWeight(
                         this.routeMap.addEdge(s.getUpStation(), s.getDownStation())
                         , s.getDistance()
-                        ));
+                ));
     }
 
     public PathResponse getPath(Station source, Station target) {
@@ -48,6 +48,7 @@ public class PathFinder {
             throw new IllegalPathException("출발역과 도착역이 연결되어있지 않습니다.");
         }
     }
+
     private void validateStationExist(Station source, Station target) {
         if (!routeMap.containsVertex(source)) {
             throw new IllegalPathException("출발역이 경로에 존재하지 않습니다.");

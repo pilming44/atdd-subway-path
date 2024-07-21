@@ -74,7 +74,7 @@ class LineTest {
         assertThat(stations.get(0)).isEqualTo(신사역);
         assertThat(stations.get(1)).isEqualTo(강남역);
     }
-    
+
     @Test
     @DisplayName("노선에 구간이 하나뿐이라면 삭제 시 예외발생")
     void 노선에_구간이_하나뿐이라면_삭제_시_예외발생() {
