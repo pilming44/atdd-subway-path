@@ -306,6 +306,28 @@ public class SectionAcceptanceTest {
         assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
     }
 
+    /**
+     * Given 구간이 3개(A-B, B-C, C-D) 등록된 노선이 있고,
+     * When 노선에 존자하지 않는 역(F)을 삭제하면
+     * Then 에러가 발생한다.
+     */
+    @Test
+    @DisplayName("노선에 등록되지 않는 구간 삭제 시 에러가 발생한다.")
+    void 존재하지않는_구간_삭제() {
+        //given
+        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
+        long lineId = lineCreationResponse.jsonPath().getLong("id");
+        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(논현역Id, 강남역Id, 4L), lineId);
+        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(강남역Id, 판교역Id, 5L), lineId);
+
+        //when
+        ExtractableResponse<Response> response = getSectionDeletionExtract(lineId, 광교역Id);
+
+        //then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private Map<String, Object> getLineRequestParamMap(
             String name,
             String color,
