@@ -41,7 +41,7 @@ public class LineAcceptanceTest {
         신사역Id = 역_생성("신사역").jsonPath().getLong("id");
         논현역Id = 역_생성("논현역").jsonPath().getLong("id");
         강남역Id = 역_생성("강남역").jsonPath().getLong("id");
-        신분당선_요청_매개변수 = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
+        신분당선_요청_매개변수 = 노선_생성_매개변수("신분당선", "bg-red-600", 신사역Id, 논현역Id, 10L);
 
     }
 
@@ -71,7 +71,7 @@ public class LineAcceptanceTest {
     @DisplayName("존재하지 않는 상행역을 포함한 노선을 생성하면 에러가 발생한다.")
     void 존재하지_않는_상행역을_포함한_노선_생성() {
         //given
-        Map<String, Object> 분당선_요청_매개변수 = getLineRequestParamMap("분당선", "bg-green-600", 99L, 신사역Id, 7L);
+        Map<String, Object> 분당선_요청_매개변수 = 노선_생성_매개변수("분당선", "bg-green-600", 99L, 신사역Id, 7L);
         // when
         ExtractableResponse<Response> response = 노선_생성_Extract(분당선_요청_매개변수);
 
@@ -83,7 +83,7 @@ public class LineAcceptanceTest {
     @DisplayName("존재하지 않는 하행역을 포함한 노선을 생성하면 에러가 발생한다.")
     void 존재하지_않는_하행역을_포함한_노선_생성() {
         //given
-        Map<String, Object> 분당선_요청_매개변수 = getLineRequestParamMap("분당선", "bg-green-600", 신사역Id, 99L, 7L);
+        Map<String, Object> 분당선_요청_매개변수 = 노선_생성_매개변수("분당선", "bg-green-600", 신사역Id, 99L, 7L);
         // when
         ExtractableResponse<Response> response = 노선_생성_Extract(분당선_요청_매개변수);
 
@@ -97,7 +97,7 @@ public class LineAcceptanceTest {
         // given
         노선_생성_Extract(신분당선_요청_매개변수);
 
-        Map<String, Object> 분당선_요청_매개변수 = getLineRequestParamMap("분당선", "bg-green-600", 신사역Id, 강남역Id, 7L);
+        Map<String, Object> 분당선_요청_매개변수 = 노선_생성_매개변수("분당선", "bg-green-600", 신사역Id, 강남역Id, 7L);
 
         노선_생성_Extract(분당선_요청_매개변수);
 
@@ -214,21 +214,6 @@ public class LineAcceptanceTest {
 
         // then
         assertThat(deleteResponse.statusCode()).isEqualTo(404);
-    }
-
-    private Map<String, Object> getLineRequestParamMap(
-            String name,
-            String color,
-            Long upStationId,
-            Long downStationId,
-            Long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("color", color);
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return params;
     }
 
     private ExtractableResponse<Response> getLineListExtract() {

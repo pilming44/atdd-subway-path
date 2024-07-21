@@ -13,9 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static nextstep.subway.acceptance.AcceptanceTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +59,7 @@ public class PathAcceptanceTest {
         노선_생성_Extract(노선_생성_매개변수("신분당선", "bg-gre-600", 강남역Id, 양재역Id, 10L));
         ExtractableResponse<Response> 삼호선_생성_응답 = 노선_생성_Extract(노선_생성_매개변수("3호선", "bg-green-600", 교대역Id, 남부터미널역Id, 2L));
         long 삼호선Id = 삼호선_생성_응답.jsonPath().getLong("id");
-        노선에_새로운_구간_추가_Extract(getSectionRequestParamMap(남부터미널역Id, 양재역Id, 3L),삼호선Id);
+        노선에_새로운_구간_추가_Extract(구간_생성_매개변수(남부터미널역Id, 양재역Id, 3L),삼호선Id);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -80,18 +78,6 @@ public class PathAcceptanceTest {
         assertThat(stations.get(1).getId()).isEqualTo(남부터미널역Id);
         assertThat(stations.get(2).getId()).isEqualTo(양재역Id);
         assertThat(distance).isEqualTo(5L);
-    }
-
-
-    private Map<String, Object> getSectionRequestParamMap(
-            Long upStationId,
-            Long downStationId,
-            Long distance) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("upStationId", upStationId);
-        params.put("downStationId", downStationId);
-        params.put("distance", distance);
-        return params;
     }
 
 
