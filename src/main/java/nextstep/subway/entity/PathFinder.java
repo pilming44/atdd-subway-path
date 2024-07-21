@@ -1,5 +1,6 @@
 package nextstep.subway.entity;
 
+import nextstep.subway.dto.PathResponse;
 import nextstep.subway.exception.IllegalPathException;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
@@ -24,7 +25,7 @@ public class PathFinder {
                         ));
     }
 
-    public Path getPath(Station source, Station target) {
+    public PathResponse getPath(Station source, Station target) {
         validateEqualStation(source, target);
         validateStationExist(source, target);
         DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(routeMap);
@@ -33,7 +34,7 @@ public class PathFinder {
         List<Station> shortestPath = path.getVertexList();
         long shortestDistance = (long) dijkstraShortestPath.getPathWeight(source, target);
 
-        return new Path(shortestPath, shortestDistance);
+        return new PathResponse(shortestPath, shortestDistance);
     }
 
     private void validateEqualStation(Station source, Station target) {

@@ -1,13 +1,15 @@
-package nextstep.subway.entity;
+package nextstep.subway.dto;
+
+import nextstep.subway.entity.Station;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path {
+public class PathResponse {
     private List<Station> stations = new ArrayList<>();
     private Long distance;
 
-    public Path(List<Station> stations, Long distance) {
+    public PathResponse(List<Station> stations, Long distance) {
         this.stations = stations;
         this.distance = distance;
     }
