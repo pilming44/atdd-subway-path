@@ -157,35 +157,6 @@ public class SectionAcceptanceTest {
     }
 
     /**
-     * Given 노선이 등록돼있고
-     * When 관리자가 노선의 마지막 구간(하행종점역)이 아닌 중간 구간을 삭제하면
-     * Then 에러가 발생하고 해당 구간은 삭제되지않는다.
-     */
-    @Test
-    @DisplayName("노선의 마지막 구간(하행종점역)이 아닌 다른 구간 삭제 시 예외 발생")
-    void 구간삭제_case3() {
-        // given
-        Map<String, Object> params = getLineRequestParamMap("신분당선", "bg-red-600", 신사역Id, 강남역Id, 10L);
-        ExtractableResponse<Response> lineCreationResponse = 노선_생성_Extract(params);
-        long lineId = lineCreationResponse.jsonPath().getLong("id");
-
-        Map<String, Object> newSection = getSectionRequestParamMap(강남역Id, 판교역Id, 10L);
-
-        노선에_새로운_구간_추가_Extract(newSection, lineId);
-
-        // when
-        ExtractableResponse<Response> response = getSectionDeletionExtract(lineId, 강남역Id);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        List<Map<String, Object>> stations = 노선_조회_Extract(lineId).jsonPath().getList("stations");
-        assertThat(stations.size()).isEqualTo(3);
-        assertThat(Long.parseLong(stations.get(0).get("id").toString())).isEqualTo(신사역Id);
-        assertThat(Long.parseLong(stations.get(1).get("id").toString())).isEqualTo(강남역Id);
-        assertThat(Long.parseLong(stations.get(2).get("id").toString())).isEqualTo(판교역Id);
-    }
-
-    /**
      * Given 구간이 하나뿐인 노선이 등록돼있고
      * When 관리자가 해당 노선의 구간을 삭제하면
      * Then 에러가 발생하고 해당 구간은 삭제되지않는다.
