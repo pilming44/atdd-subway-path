@@ -36,7 +36,7 @@ public class PathService {
         }
         List<Line> allLines = lineRepository.findAll();
         PathFinder pathFinder = new PathFinder();
-        allLines.stream().forEach(pathFinder::addLine);
+        pathFinder.addAllLines(allLines);
         return pathFinder.getPath(sourceStation, targetStation);
     }
 

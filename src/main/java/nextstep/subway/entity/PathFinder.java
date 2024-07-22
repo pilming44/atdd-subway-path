@@ -25,6 +25,10 @@ public class PathFinder {
                 ));
     }
 
+    public void addAllLines(List<Line> lines) {
+        lines.stream().forEach(this::addLine);
+    }
+
     public PathResponse getPath(Station source, Station target) {
         validateEqualStation(source, target);
         validateStationExist(source, target);
