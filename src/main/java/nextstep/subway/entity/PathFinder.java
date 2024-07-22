@@ -34,7 +34,7 @@ public class PathFinder {
         List<Station> shortestPath = path.getVertexList();
         long shortestDistance = (long) dijkstraShortestPath.getPathWeight(source, target);
 
-        return new PathResponse(shortestPath, shortestDistance);
+        return PathResponse.from(shortestPath, shortestDistance);
     }
 
     private void validateEqualStation(Station source, Station target) {

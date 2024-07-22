@@ -1,10 +1,13 @@
 package nextstep.subway.entity;
 
 import nextstep.subway.dto.PathResponse;
+import nextstep.subway.dto.StationResponse;
 import nextstep.subway.exception.IllegalPathException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,8 +50,11 @@ class PathFinderTest {
         PathResponse pathResponse = pathFinder.getPath(교대역, 양재역);
 
         // then
-        assertThat(pathResponse.getStations()).hasSize(3);
-        assertThat(pathResponse.getStations()).containsExactly(교대역, 남부터미널역, 양재역);
+        List<StationResponse> responseStations = pathResponse.getStations();
+        assertThat(responseStations).hasSize(3);
+        assertThat(responseStations.get(0).getId()).isEqualTo(교대역.getId());
+        assertThat(responseStations.get(1).getId()).isEqualTo(남부터미널역.getId());
+        assertThat(responseStations.get(2).getId()).isEqualTo(양재역.getId());
         assertThat(pathResponse.getDistance()).isEqualTo(5L);
     }
 
