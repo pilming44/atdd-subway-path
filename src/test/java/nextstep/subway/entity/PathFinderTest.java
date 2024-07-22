@@ -60,8 +60,8 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("출발역과 도착역이 같은 경우")
-    void 출발역과_도착역이_같은_경우() {
+    @DisplayName("출발역과 도착역이 같은 경우 조회 불가능 예외 발생")
+    void 출발역과_도착역이_같은_경우_예외_발생() {
         // given
         Line 이호선 = new Line("2호선", "bg-green-600");
         이호선.addSection(교대역, 강남역, 10L);
@@ -87,8 +87,8 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("출발역과 도착역이 연결이 되어 있지 않은 경우")
-    void 출발역과_도착역이_연결_안됨() {
+    @DisplayName("출발역과 도착역이 연결이 되어 있지 않은 경우 예외 발생")
+    void 출발역과_도착역이_연결_안됨_예외_발생() {
         // given
         Line 이호선 = new Line("2호선", "bg-green-600");
         이호선.addSection(교대역, 남부터미널역, 10L);
@@ -109,8 +109,8 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("존재하지 않은 출발역을 조회 할 경우")
-    void 존재하지_않는_출발역_조회() {
+    @DisplayName("존재하지 않은 출발역을 조회 할 경우 예외 발생")
+    void 존재하지_않는_출발역_조회_예외_발생() {
         // given
         Station 사당역 = new Station("사당역");
 
@@ -138,8 +138,8 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("존재하지 않은 도착역을 조회 할 경우")
-    void 존재하지_않는_도착역_조회() {
+    @DisplayName("존재하지 않은 도착역을 조회 할 경우 예외 발생")
+    void 존재하지_않는_도착역_조회_예외_발생() {
         // given
         Station 사당역 = new Station("사당역");
 
