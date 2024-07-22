@@ -12,30 +12,25 @@ import java.util.List;
 public class PathFinder {
     private WeightedMultigraph<Station, DefaultWeightedEdge> routeMap = new WeightedMultigraph(DefaultWeightedEdge.class);
 
-    public void addLine(Line line) {
-        List<Station> stations = line.getStations();
-        stations.stream().forEach(this.routeMap::addVertex);
-
-        Sections sections = line.getSections();
-        List<Section> sectionList = sections.getSectionList();
-        sectionList.stream()
-                .forEach(s -> this.routeMap.setEdgeWeight(
-                        this.routeMap.addEdge(s.getUpStation(), s.getDownStation())
-                        , s.getDistance()
-                ));
+    private PathFinder(WeightedMultigraph<Station, DefaultWeightedEdge> routeMap) {
+        this.routeMap = routeMap;
     }
 
-    public void addAllLines(List<Line> lines) {
-        lines.stream().forEach(this::addLine);
+    public static PathFinderBuilder searchBuild() {
+        return new PathFinderBuilder();
     }
 
     public PathResponse getPath(Station source, Station target) {
         validateEqualStation(source, target);
         validateStationExist(source, target);
+
         DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(routeMap);
         GraphPath path = dijkstraShortestPath.getPath(source, target);
+
         validateLinkedPath(path);
+
         List<Station> shortestPath = path.getVertexList();
+
         long shortestDistance = (long) dijkstraShortestPath.getPathWeight(source, target);
 
         return PathResponse.from(shortestPath, shortestDistance);
@@ -59,6 +54,37 @@ public class PathFinder {
         }
         if (!routeMap.containsVertex(target)) {
             throw new IllegalPathException("도착역이 경로에 존재하지 않습니다.");
+        }
+    }
+
+    public static class PathFinderBuilder {
+        private WeightedMultigraph<Station, DefaultWeightedEdge> routeMap;
+
+        public PathFinderBuilder() {
+            this.routeMap = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        }
+
+        public PathFinderBuilder addLine(Line line) {
+            List<Station> stations = line.getStations();
+            stations.stream().forEach(this.routeMap::addVertex);
+
+            Sections sections = line.getSections();
+            List<Section> sectionList = sections.getSectionList();
+            sectionList.stream()
+                    .forEach(s -> this.routeMap.setEdgeWeight(
+                            this.routeMap.addEdge(s.getUpStation(), s.getDownStation())
+                            , s.getDistance()
+                    ));
+            return this;
+        }
+
+        public PathFinderBuilder addAllLines(List<Line> lines) {
+            lines.stream().forEach(this::addLine);
+            return this;
+        }
+
+        public PathFinder build() {
+            return new PathFinder(this.routeMap);
         }
     }
 }

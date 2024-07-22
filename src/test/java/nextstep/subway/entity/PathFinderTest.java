@@ -41,10 +41,11 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addLine(이호선);
-        pathFinder.addLine(신분당선);
-        pathFinder.addLine(삼호선);
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addLine(이호선)
+                .addLine(신분당선)
+                .addLine(삼호선)
+                .build();
 
         // when
         PathResponse pathResponse = pathFinder.getPath(교대역, 양재역);
@@ -73,10 +74,11 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addLine(이호선);
-        pathFinder.addLine(신분당선);
-        pathFinder.addLine(삼호선);
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addLine(이호선)
+                .addLine(신분당선)
+                .addLine(삼호선)
+                .build();
 
         // when then
         assertThatThrownBy(() -> pathFinder.getPath(교대역, 교대역))
@@ -95,9 +97,10 @@ class PathFinderTest {
         신분당선.addSection(강남역, 양재역, 10L);
 
 
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addLine(이호선);
-        pathFinder.addLine(신분당선);
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addLine(이호선)
+                .addLine(신분당선)
+                .build();
 
         // when then
         assertThatThrownBy(() -> pathFinder.getPath(교대역, 양재역))
@@ -122,10 +125,11 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addLine(이호선);
-        pathFinder.addLine(신분당선);
-        pathFinder.addLine(삼호선);
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addLine(이호선)
+                .addLine(신분당선)
+                .addLine(삼호선)
+                .build();
 
         // when then
         assertThatThrownBy(() -> pathFinder.getPath(사당역, 양재역))
@@ -150,10 +154,11 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addLine(이호선);
-        pathFinder.addLine(신분당선);
-        pathFinder.addLine(삼호선);
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addLine(이호선)
+                .addLine(신분당선)
+                .addLine(삼호선)
+                .build();
 
         // when then
         assertThatThrownBy(() -> pathFinder.getPath(교대역, 사당역))

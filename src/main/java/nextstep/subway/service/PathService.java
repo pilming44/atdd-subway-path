@@ -35,8 +35,11 @@ public class PathService {
             targetStation = getStation(pathRequest.getTarget());
         }
         List<Line> allLines = lineRepository.findAll();
-        PathFinder pathFinder = new PathFinder();
-        pathFinder.addAllLines(allLines);
+
+        PathFinder pathFinder = PathFinder.searchBuild()
+                .addAllLines(allLines)
+                .build();
+
         return pathFinder.getPath(sourceStation, targetStation);
     }
 
