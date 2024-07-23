@@ -46,6 +46,32 @@ public final class AcceptanceTestUtil {
                 .extract();
     }
 
+    static Map<String, Object> 노선_생성_매개변수(
+            String name,
+            String color,
+            Long upStationId,
+            Long downStationId,
+            Long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("color", color);
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+        return params;
+    }
+
+    static Map<String, Object> 구간_생성_매개변수(
+            Long upStationId,
+            Long downStationId,
+            Long distance) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("upStationId", upStationId);
+        params.put("downStationId", downStationId);
+        params.put("distance", distance);
+        return params;
+    }
+
     private AcceptanceTestUtil() {
     }
 }

@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 
 @Embeddable
 public class Sections {
+    private final int FIRST_OR_END_SECTION_INDEX = 0;
+    private final int FRONT_SECTION_INDEX = 0;
+    private final int BACK_SECTION_INDEX = 1;
+
     @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Section> sectionList = new ArrayList<>();
 
@@ -80,24 +84,29 @@ public class Sections {
         }
     }
 
-    public void removeSection(Station station) {
+    public void removeSectionByStation(Station station) {
         validateDeleteEmpty();
         validateDeleteOnlyOne();
         validateLineStation(station);
 
-        sectionRemove(station);
+        removeSection(station);
     }
 
-    private void sectionRemove(Station station) {
+    private void removeSection(Station station) {
         List<Section> collectSection = findSectionsContainingStation(station);
 
+        if (collectSection == null || collectSection.isEmpty()) {
+            throw new IllegalSectionException("노선에 해당 역을 포한한 구간이 없습니다.");
+        }
+
         if (collectSection.size() == 1) {
-            removeSingleSection(collectSection.get(0));
+            removeSingleSection(collectSection.get(FIRST_OR_END_SECTION_INDEX));
             return;
         }
 
         if (collectSection.size() == 2) {
-            removeAndCombineSections(collectSection.get(0), collectSection.get(1));
+            combineFrontAndBackSection(collectSection.get(FRONT_SECTION_INDEX), collectSection.get(BACK_SECTION_INDEX));
+            removeSingleSection(collectSection.get(BACK_SECTION_INDEX));
             return;
         }
     }
@@ -108,11 +117,7 @@ public class Sections {
                 .collect(Collectors.toList());
     }
 
-    private void removeSingleSection(Section section) {
-        sectionList.remove(section);
-    }
-
-    private void removeAndCombineSections(Section frontSection, Section backSection) {
+    private void combineFrontAndBackSection(Section frontSection, Section backSection) {
         Long distanceSum = frontSection.getDistance() + backSection.getDistance();
         Section combinedSection = new Section(frontSection.getLine(),
                 frontSection.getUpStation(),
@@ -120,10 +125,12 @@ public class Sections {
                 distanceSum);
 
         int frontSectionIndex = sectionList.indexOf(frontSection);
-        int backSectionIndex = sectionList.indexOf(backSection);
 
         sectionList.set(frontSectionIndex, combinedSection);
-        sectionList.remove(backSectionIndex);
+    }
+
+    private void removeSingleSection(Section section) {
+        sectionList.remove(section);
     }
 
     private boolean isFirstSection(Station newDownStation, Station firstUpStation) {
@@ -153,7 +160,7 @@ public class Sections {
         Long newDistance = section.getDistance();
 
         Section sectionByUpStation = findSectionByUpStation(section.getUpStation())
-                .orElseThrow(()->new IllegalSectionException("구간을 추가할 수 없습니다."));
+                .orElseThrow(() -> new IllegalSectionException("구간을 추가할 수 없습니다."));
 
         int oldIndex = sectionList.indexOf(sectionByUpStation);
 
