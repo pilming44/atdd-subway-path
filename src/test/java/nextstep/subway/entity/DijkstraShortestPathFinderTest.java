@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PathFinderTest {
+class DijkstraShortestPathFinderTest {
     private Station 교대역;
     private Station 강남역;
     private Station 양재역;
@@ -41,14 +41,19 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addLine(이호선)
-                .addLine(신분당선)
-                .addLine(삼호선)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder()
+                .addVertex(이호선.getStations())
+                .addEdgeWeight(이호선.getSections().getSectionList())
+                .addVertex(신분당선.getStations())
+                .addEdgeWeight(신분당선.getSections().getSectionList())
+                .addVertex(삼호선.getStations())
+                .addEdgeWeight(삼호선.getSections().getSectionList());
 
         // when
-        PathResponse pathResponse = pathFinder.getPath(교대역, 양재역);
+        PathResponse pathResponse = pathFinderBuilder
+                .setSource(교대역)
+                .setTarget(양재역)
+                .find();
 
         // then
         List<StationResponse> responseStations = pathResponse.getStations();
@@ -74,14 +79,16 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addLine(이호선)
-                .addLine(신분당선)
-                .addLine(삼호선)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder()
+                .addVertex(이호선.getStations())
+                .addEdgeWeight(이호선.getSections().getSectionList())
+                .addVertex(신분당선.getStations())
+                .addEdgeWeight(신분당선.getSections().getSectionList())
+                .addVertex(삼호선.getStations())
+                .addEdgeWeight(삼호선.getSections().getSectionList());
 
         // when then
-        assertThatThrownBy(() -> pathFinder.getPath(교대역, 교대역))
+        assertThatThrownBy(() -> pathFinderBuilder.setSource(교대역).setTarget(교대역).find())
                 .isInstanceOf(IllegalPathException.class)
                 .hasMessage("출발역과 도착역이 같은 경우 경로를 조회할수 없습니다.");
     }
@@ -96,14 +103,14 @@ class PathFinderTest {
         Line 신분당선 = new Line("신분당선", "bg-blue-600");
         신분당선.addSection(강남역, 양재역, 10L);
 
-
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addLine(이호선)
-                .addLine(신분당선)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder()
+                .addVertex(이호선.getStations())
+                .addEdgeWeight(이호선.getSections().getSectionList())
+                .addVertex(신분당선.getStations())
+                .addEdgeWeight(신분당선.getSections().getSectionList());
 
         // when then
-        assertThatThrownBy(() -> pathFinder.getPath(교대역, 양재역))
+        assertThatThrownBy(() -> pathFinderBuilder.setSource(교대역).setTarget(양재역).find())
                 .isInstanceOf(IllegalPathException.class)
                 .hasMessage("출발역과 도착역이 연결되어있지 않습니다.");
     }
@@ -125,14 +132,16 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addLine(이호선)
-                .addLine(신분당선)
-                .addLine(삼호선)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder()
+                .addVertex(이호선.getStations())
+                .addEdgeWeight(이호선.getSections().getSectionList())
+                .addVertex(신분당선.getStations())
+                .addEdgeWeight(신분당선.getSections().getSectionList())
+                .addVertex(삼호선.getStations())
+                .addEdgeWeight(삼호선.getSections().getSectionList());
 
         // when then
-        assertThatThrownBy(() -> pathFinder.getPath(사당역, 양재역))
+        assertThatThrownBy(() -> pathFinderBuilder.setSource(사당역).setTarget(양재역).find())
                 .isInstanceOf(IllegalPathException.class)
                 .hasMessage("출발역이 경로에 존재하지 않습니다.");
     }
@@ -154,14 +163,16 @@ class PathFinderTest {
         삼호선.addSection(교대역, 남부터미널역, 2L);
         삼호선.addSection(남부터미널역, 양재역, 3L);
 
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addLine(이호선)
-                .addLine(신분당선)
-                .addLine(삼호선)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder()
+                .addVertex(이호선.getStations())
+                .addEdgeWeight(이호선.getSections().getSectionList())
+                .addVertex(신분당선.getStations())
+                .addEdgeWeight(신분당선.getSections().getSectionList())
+                .addVertex(삼호선.getStations())
+                .addEdgeWeight(삼호선.getSections().getSectionList());
 
         // when then
-        assertThatThrownBy(() -> pathFinder.getPath(교대역, 사당역))
+        assertThatThrownBy(() -> pathFinderBuilder.setSource(교대역).setTarget(사당역).find())
                 .isInstanceOf(IllegalPathException.class)
                 .hasMessage("도착역이 경로에 존재하지 않습니다.");
     }

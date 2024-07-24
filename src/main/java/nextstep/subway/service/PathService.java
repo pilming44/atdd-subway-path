@@ -3,7 +3,8 @@ package nextstep.subway.service;
 import nextstep.subway.dto.PathRequest;
 import nextstep.subway.dto.PathResponse;
 import nextstep.subway.entity.Line;
-import nextstep.subway.entity.PathFinder;
+import nextstep.subway.entity.DijkstraShortestPathFinder;
+import nextstep.subway.entity.PathFinderBuilder;
 import nextstep.subway.entity.Station;
 import nextstep.subway.exception.IllegalPathException;
 import nextstep.subway.exception.NoSuchStationException;
@@ -35,11 +36,18 @@ public class PathService {
 
         List<Line> allLines = lineRepository.findAll();
 
-        PathFinder pathFinder = PathFinder.searchBuild()
-                .addAllLines(allLines)
-                .build();
+        PathFinderBuilder pathFinderBuilder = DijkstraShortestPathFinder.searchBuilder();
 
-        return pathFinder.getPath(sourceStation, targetStation);
+        allLines.stream()
+                .forEach(l -> pathFinderBuilder
+                        .addVertex(l.getStations())
+                        .addEdgeWeight(l.getSections().getSectionList())
+                );
+
+        return pathFinderBuilder
+                .setSource(sourceStation)
+                .setTarget(targetStation)
+                .find();
     }
 
     private Station getStation(Long stationId) {
