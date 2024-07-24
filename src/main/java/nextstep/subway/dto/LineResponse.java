@@ -39,7 +39,7 @@ public class LineResponse {
     public static LineResponse from(Line line) {
         List<Station> stations = line.getStations();
         List<StationResponse> stationResponse = stations.stream()
-                .map(station -> new StationResponse(station.getId(), station.getName()))
+                .map(StationResponse::from)
                 .collect(Collectors.toList());
         LineResponse lineResponse = new LineResponse(
                 line.getId(),
