@@ -5,6 +5,7 @@ import nextstep.subway.dto.PathResponse;
 import nextstep.subway.entity.Line;
 import nextstep.subway.entity.PathFinder;
 import nextstep.subway.entity.Station;
+import nextstep.subway.exception.IllegalPathException;
 import nextstep.subway.exception.NoSuchStationException;
 import nextstep.subway.repository.LineRepository;
 import nextstep.subway.repository.StationRepository;
@@ -25,15 +26,13 @@ public class PathService {
     }
 
     public PathResponse getPath(PathRequest pathRequest) {
-        Station sourceStation = null;
-        Station targetStation = null;
+        if (pathRequest.getSource() == null|| pathRequest.getTarget() == null) {
+            throw new IllegalPathException("경로를 찾을수 없습니다.");
+        }
 
-        if (pathRequest.getSource() != null) {
-            sourceStation = getStation(pathRequest.getSource());
-        }
-        if (pathRequest.getTarget() != null) {
-            targetStation = getStation(pathRequest.getTarget());
-        }
+        Station sourceStation = getStation(pathRequest.getSource());
+        Station targetStation = getStation(pathRequest.getTarget());
+
         List<Line> allLines = lineRepository.findAll();
 
         PathFinder pathFinder = PathFinder.searchBuild()
